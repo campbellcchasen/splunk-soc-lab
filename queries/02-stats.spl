@@ -1,0 +1,7 @@
+index=main sourcetype=access_combined* | stats count by status
+index=main sourcetype=access_combined* | top limit=10 clientip
+index=main sourcetype=access_combined* | rare limit=10 uri_path
+index=main sourcetype=access_combined* | timechart span=1h count by status
+index=main sourcetype=access_combined* | stats count by clientip | where count > 50 | sort - count
+index=main sourcetype=access_combined* | stats count, dc(clientip) AS unique_ips, sum(bytes) AS total_bytes by host
+index=main source="WinEventLog:Security" | stats count by EventCode | sort - count

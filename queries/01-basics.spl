@@ -1,0 +1,6 @@
+index=main
+index=main sourcetype=access_combined*
+index=main error
+index=main sourcetype=access_combined* status=404
+index=main sourcetype=access_combined* (status=404 OR status=500) NOT clientip=10.*
+index=main source="WinEventLog:Security" EventCode=4625

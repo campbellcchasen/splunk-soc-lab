@@ -1,0 +1,20 @@
+# Splunk installers, downloaded sample data, and anything with secrets
+*.msi
+*.zip
+tutorialdata*
+Prices.csv*
+.env
+*.pem
+*.key
+passwords.txt
+credentials*
+
+# Raw screenshots (redact first, then save the clean copy in /screenshots)
+screenshots/raw/
+
+# OS and editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/

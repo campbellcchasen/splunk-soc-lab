@@ -1,0 +1,19 @@
+index=main sourcetype=access_combined* | eval result=if(status>=400,"error","ok") | stats count by result
+
+index=main sourcetype=access_combined*
+| eval class=case(status<300,"success",status<400,"redirect",status<500,"client_error",true(),"server_error")
+| stats count by class
+
+index=main sourcetype=access_combined*
+| eval mb=round(bytes/1024/1024,2)
+| stats sum(mb) AS total_mb by clientip
+| sort - total_mb
+| head 10
+
+index=main source="WinEventLog:Security" EventCode=4625
+| eval target_user=mvindex(Account_Name,1)
+| stats count by target_user, Logon_Type
+
+index=main source="WinEventLog:Security" EventCode=4625
+| rex field=_raw "Failure Reason:\s+(?<failure_reason>.+)"
+| stats count by failure_reason
