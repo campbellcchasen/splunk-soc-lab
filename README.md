@@ -1,69 +1,154 @@
-# Splunk SOC Analyst Lab (Windows)
+\# Splunk SOC Analyst Lab (Windows)
 
-A hands-on home lab where I installed Splunk Enterprise on a Windows PC, ingested Windows Security event logs and Splunk's tutorial data, and built SOC-style detections, an alert, and a dashboard.
 
-> **Lab only.** Everything here runs on my personal computer with throwaway test accounts. No employer, customer, or personal data is included.
 
-## Goals
+A hands-on home lab where I installed Splunk Enterprise on a Windows PC, ingested my own Windows Security and System event logs plus Splunk's tutorial data, generated attack-like activity with throwaway test accounts, and wrote and validated seven SOC-style detections mapped to MITRE ATT\&CK.
 
-- Learn the Splunk workflow end to end: install, ingest, search, detect, alert, visualize.
-- Practice SPL (Search Processing Language) with `stats`, `eval`, `rex`, `timechart`, `where`, and `sort`.
-- Write detections mapped to MITRE ATT&CK and practice triaging the results.
-- Practice writing short, clear investigation notes like an analyst would for a customer.
 
-## Environment
+
+> \*\*Lab only.\*\* Everything here runs on my personal computer with throwaway test accounts. No employer, customer, or personal data is included.
+
+
+
+\## Goals
+
+
+
+\- Learn the Splunk workflow: install, ingest, search, detect.
+
+\- Practice SPL (Search Processing Language) with `stats`, `eval`, `rex`, `timechart`, `where`, and `sort`.
+
+\- Write detections mapped to MITRE ATT\&CK and practice triaging the results.
+
+\- Practice writing short, clear investigation notes like an analyst would for a customer.
+
+
+
+\## Environment
+
+
 
 | Item | Value |
+
 | --- | --- |
+
 | Host OS | Windows 10/11 (personal PC) |
-| SIEM | Splunk Enterprise (60-day trial license) |
-| Data | Windows Event Logs (Security, System, Application) and Splunk tutorial data |
-| Test account | Local, non-admin user `labuser`, deleted after testing |
 
-## Repo layout
+| SIEM | Splunk Enterprise (trial license) |
+
+| Data | Windows Security and System event logs (index `winlogs`) and Splunk tutorial data (index `main`) |
+
+| Test account | Local user `testuser`, added to Administrators for testing, then deleted |
+
+
+
+\## Repo layout
+
+
 
 ```
-docs/        Step-by-step guides (setup, data, SPL, detections, alerts)
+
 queries/     Copy-paste SPL files, one per topic
-scripts/     PowerShell helpers to create the lab user and generate test events
-screenshots/ Redacted screenshots of results (see screenshots/README.md)
+
+screenshots/ Screenshots of results
+
+docs/        Supporting notes
+
+scripts/     Helper scripts
+
 ```
 
-## Quick start
 
-1. Follow [docs/01-install-splunk-windows.md](docs/01-install-splunk-windows.md).
-2. Follow [docs/02-load-and-generate-data.md](docs/02-load-and-generate-data.md).
-3. Work through [docs/03-spl-fundamentals.md](docs/03-spl-fundamentals.md).
-4. Run the detections in [docs/04-detections.md](docs/04-detections.md).
-5. Build the alert and dashboard in [docs/05-alerts-and-dashboards.md](docs/05-alerts-and-dashboards.md).
 
-## Detections
+\## Detections (validated against my own generated events)
 
-| ID | Detection | MITRE ATT&CK | Data source | Query |
+
+
+| ID | Detection | MITRE ATT\&CK | Event ID | Evidence |
+
 | --- | --- | --- | --- | --- |
-| D1 | Multiple failed logons (brute force) | T1110 | Windows Security 4625 | [queries/04-detections-windows.spl](queries/04-detections-windows.spl) |
-| D2 | Failed logons followed by a success | T1110 / T1078 | Windows Security 4625 + 4624 | same file |
-| D3 | New local account created | T1136.001 | Windows Security 4720 | same file |
-| D4 | Security audit log cleared | T1070.001 | Windows Security 1102 | same file |
-| D5 | Web scanner (many 404s from one client) | T1595 | Tutorial web logs | [queries/05-detections-web.spl](queries/05-detections-web.spl) |
-| D6 | Large data transfer by client | T1048 | Tutorial web logs | same file |
-| D7 | Spike in failures over time | T1110 | Windows Security 4625 | same file |
 
-## Skills practiced
+| D1 | Multiple failed logons (brute force) | T1110 | 4625 | \[screenshot](screenshots/05-d1-failed-logons.png) |
 
-Splunk install and administration basics, data onboarding (Windows event log inputs), SPL, alert and dashboard creation, MITRE ATT&CK mapping, alert triage, and investigation write-ups.
+| D2 | Failed logons followed by a success | T1110 / T1078 | 4625 + 4624 | \[screenshot](screenshots/06-d2-bruteforce-success.png) |
 
-## Results
+| D3 | New local account created | T1136.001 | 4720 | \[screenshot](screenshots/07-d3-new-account.png) |
 
-Screenshots of the search results, alert, and dashboard are in [`screenshots/`](screenshots/).
+| D4 | Security audit log cleared | T1070.001 | 1102 | Query written; I did not clear my logs, so it returns no results |
 
-## What I'd do next
+| D5 | Member added to Administrators | T1098 | 4732 | \[screenshot](screenshots/08-d5-admin-group-add.png) |
 
-- Add Sysmon for richer endpoint telemetry.
-- Install the Splunk Add-on for Microsoft Windows and compare normalized (CIM) field names.
-- Try the same detections in Elastic (KQL) to compare query languages.
-- Explore Splunk's BOTS (Boss of the SOC) datasets for harder investigations.
+| D6 | New service installed | T1543.003 | 7045 (System) | \[screenshot](screenshots/09-d6-service-install.png) |
 
-## License
+| D7 | Spike in failed logons over time | T1110 | 4625 | \[screenshot](screenshots/10-d7-failed-logon-spike.png) |
 
-MIT. See [LICENSE](LICENSE).
+
+
+All Windows detections are in \[queries/04-detections-windows.spl](queries/04-detections-windows.spl).
+
+
+
+Additional web-log detections on the tutorial data are in \[queries/05-detections-web.spl](queries/05-detections-web.spl): W1 web scanner (many 404s from one client, T1595) and W2 large data transfer by client (T1048).
+
+
+
+\## How I built it
+
+
+
+1\. Installed Splunk Enterprise on Windows and confirmed `splunkd` was running.
+
+2\. Loaded Splunk's tutorial data (about 110k events) into `main`. \[Screenshot](screenshots/02-tutorial-data-loaded.png)
+
+3\. Created an index named `winlogs` and added the local Security and System event logs as inputs. \[Screenshot](screenshots/03-winlogs-ingested.png)
+
+4\. Generated test activity from an admin terminal: created `testuser`, added it to Administrators, ran 8 failed logons followed by a successful one, and installed a test service. \[Screenshot](screenshots/04-generated-events.png)
+
+5\. Wrote each detection in SPL, tested it against those events, and cleaned up the test account and service afterward.
+
+
+
+\## Example triage: D2 (failed logons then success)
+
+
+
+\- \*\*What it means:\*\* Several failures followed by a success on the same account can indicate a successful password-guessing attack.
+
+\- \*\*First checks:\*\* Source IP and logon type, whether the account is privileged, how long between the last failure and the success, and whether the source is normal for that user.
+
+\- \*\*Next steps:\*\* Look at what the account did after the success (new accounts, group changes, services). If suspicious, reset the password, disable the account, and escalate with the timeline.
+
+
+
+\## Lessons learned
+
+
+
+\- \*\*Service permissions:\*\* Splunk ran as the virtual account `NT SERVICE\\Splunkd`, which cannot read the Security log. I fixed it by adding that account to the local \*\*Event Log Readers\*\* group and restarting the service.
+
+\- \*\*Field extraction:\*\* Without the Splunk Add-on for Microsoft Windows, fields like `Account\_Name` were not extracted, so I used `rex` against the event text.
+
+\- \*\*Multi-value fields:\*\* Windows events list several `Account Name` values (the requester first, the target account second). Picking the last value returned `-` for 4624 events, so I switched to `mvindex(acct,1)`. Checking the raw event fixed it.
+
+
+
+\## What I'd do next
+
+
+
+\- Save D2 as a scheduled Splunk alert.
+
+\- Add Sysmon for richer endpoint telemetry.
+
+\- Install the Splunk Add-on for Microsoft Windows and compare normalized (CIM) field names.
+
+\- Explore Splunk's BOTS (Boss of the SOC) datasets for harder investigations.
+
+
+
+\## License
+
+
+
+MIT. See \[LICENSE](LICENSE).
+

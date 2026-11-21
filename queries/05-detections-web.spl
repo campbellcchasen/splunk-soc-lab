@@ -1,10 +1,10 @@
-# D5 - Web scanner (T1595)
+# W1 - Web scanner (T1595)
 index=main sourcetype=access_combined* status=404
 | stats count, dc(uri_path) AS paths by clientip
 | where paths > 20
 | sort - paths
 
-# D6 - Large data transfer (T1048)
+# W2 - Large data transfer (T1048)
 index=main sourcetype=access_combined*
 | stats sum(bytes) AS total by clientip
 | eval mb=round(total/1024/1024,1)

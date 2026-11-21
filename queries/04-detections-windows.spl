@@ -1,27 +1,48 @@
-# D1 - Multiple failed logons (T1110)
-index=main source="WinEventLog:Security" EventCode=4625
-| eval target_user=mvindex(Account_Name,1)
-| stats count AS failures, dc(target_user) AS accounts_tried, values(Logon_Type) AS logon_types by Source_Network_Address
+# D1 - Multiple failed logons (T1110 Brute Force)
+index=winlogs source="WinEventLog:Security" EventCode=4625
+| rex max_match=0 "Account Name:\s+(?<acct>\S+)"
+| rex "Source Network Address:\s+(?<src_ip>\S+)"
+| rex "Logon Type:\s+(?<logon_type>\d+)"
+| eval target_user=mvindex(acct,1)
+| stats count AS failures, dc(target_user) AS accounts_tried, values(logon_type) AS logon_types by src_ip
 | where failures > 5
 | sort - failures
 
-# D2 - Failures followed by a success (T1110 / T1078)
-index=main source="WinEventLog:Security" (EventCode=4625 OR EventCode=4624)
-| eval target_user=mvindex(Account_Name,1)
+# D2 - Failures followed by a success (T1110 / T1078 Valid Accounts)
+index=winlogs source="WinEventLog:Security" (EventCode=4625 OR EventCode=4624)
+| rex max_match=0 "Account Name:\s+(?<acct>\S+)"
+| eval target_user=mvindex(acct,1)
 | eval outcome=if(EventCode=4625,"failure","success")
 | stats count(eval(outcome="failure")) AS failures, count(eval(outcome="success")) AS successes, earliest(_time) AS first_seen, latest(_time) AS last_seen by target_user
 | where failures > 3 AND successes > 0
 | eval first_seen=strftime(first_seen,"%F %T"), last_seen=strftime(last_seen,"%F %T")
 
-# D3 - New local account created (T1136.001)
-index=main source="WinEventLog:Security" EventCode=4720
-| eval created_by=mvindex(Account_Name,0), new_account=mvindex(Account_Name,1)
+# D3 - New local account created (T1136.001 Create Account)
+index=winlogs source="WinEventLog:Security" EventCode=4720
+| rex max_match=0 "Account Name:\s+(?<acct>\S+)"
+| eval created_by=mvindex(acct,0), new_account=mvindex(acct,1)
 | table _time host created_by new_account
 
-# D4 - Security audit log cleared (T1070.001)
-index=main source="WinEventLog:Security" EventCode=1102
-| table _time host Account_Name
+# D4 - Security audit log cleared (T1070.001 Clear Windows Event Logs)
+index=winlogs source="WinEventLog:Security" EventCode=1102
+| rex "Account Name:\s+(?<acct>\S+)"
+| table _time host acct
 
-# D7 - Spike in failures over time (T1110)
-index=main source="WinEventLog:Security" EventCode=4625
+# D5 - Member added to Administrators (T1098 Account Manipulation)
+index=winlogs source="WinEventLog:Security" EventCode=4732
+| rex "Subject:\s+Security ID:\s+\S+\s+Account Name:\s+(?<changed_by>\S+)"
+| rex "Member:\s+Security ID:\s+(?<member_sid>\S+)"
+| rex "Group Name:\s+(?<group>[^\r\n]+)"
+| eval group=trim(group)
+| where group="Administrators"
+| table _time host changed_by member_sid group
+
+# D6 - New service installed (T1543.003 Windows Service)
+index=winlogs source="WinEventLog:System" EventCode=7045
+| rex "Service Name:\s+(?<service_name>[^\r\n]+)"
+| rex "Service File Name:\s+(?<service_path>[^\r\n]+)"
+| table _time host service_name service_path
+
+# D7 - Spike in failed logons over time (T1110)
+index=winlogs source="WinEventLog:Security" EventCode=4625
 | timechart span=15m count

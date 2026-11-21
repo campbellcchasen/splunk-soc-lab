@@ -1,23 +1,36 @@
-# Screenshots
+\# Screenshots
 
-Add clean, redacted screenshots here after each part of the lab. Suggested set:
+
+
+Screenshots of each stage of the lab. Computer name and Windows username are blacked out.
+
+
 
 | File name | Shows |
+
 | --- | --- |
+
 | `01-splunk-home.png` | Splunk Home after install |
-| `02-data-summary.png` | `stats count by host, sourcetype` result |
-| `03-failed-logons-d1.png` | D1 brute force results |
-| `04-fail-then-success-d2.png` | D2 results |
-| `05-new-account-d3.png` | D3 results |
-| `06-alert-config.png` | The saved alert settings |
-| `07-dashboard.png` | The SOC Overview dashboard |
 
-## Redact before you commit
+| `02-tutorial-data-loaded.png` | Tutorial data loaded (`stats count by index, sourcetype`) |
 
-Public screenshots can leak personal details. Before saving, blur or crop:
+| `03-winlogs-ingested.png` | Windows Security and System logs ingested into `winlogs` |
 
-- Your computer name, Windows username, and real account names
-- IP addresses and email addresses
-- Anything from an employer or customer (none should be in this lab)
+| `04-generated-events.png` | Generated test events (4624, 4625, 4720, 4732, 7045) |
 
-Put unredacted originals in `screenshots/raw/`. That folder is in `.gitignore` and will not be uploaded.
+| `05-d1-failed-logons.png` | D1 failed logons |
+
+| `06-d2-bruteforce-success.png` | D2 failures followed by a success |
+
+| `07-d3-new-account.png` | D3 new local account |
+
+| `08-d5-admin-group-add.png` | D5 member added to Administrators |
+
+| `09-d6-service-install.png` | D6 new service installed |
+
+| `10-d7-failed-logon-spike.png` | D7 failed logon spike over time |
+
+
+
+Unredacted originals are kept locally in `screenshots/raw/`, which is in `.gitignore` and is not uploaded.
+
