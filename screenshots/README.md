@@ -28,3 +28,4 @@ Unredacted originals are kept locally in `screenshots/raw/` (not committed — s
 | 17 | `17-l3-sudo-root.png` | L3 — sudo session opened for root |
 | 18 | `18-l4-new-user.png` | L4 — new local user created (`labvictim`) |
 | 19 | `19-d4-log-cleared.png` | D4 — security audit log cleared (Event 1102) |
+| 20 | `20-l2-ssh-fail-then-success.png` | L2 — SSH failures followed by a success (`labvictim`) |

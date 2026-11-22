@@ -9,7 +9,7 @@ index=linuxlogs sourcetype=linux_secure "Failed password"
 index=linuxlogs sourcetype=linux_secure ("Failed password" OR "Accepted password")
 | rex "(?<outcome>Failed|Accepted) password for (invalid user )?(?<target_user>\S+) from (?<src_ip>\S+)"
 | stats count(eval(outcome="Failed")) AS failures, count(eval(outcome="Accepted")) AS successes, earliest(_time) AS first_seen, latest(_time) AS last_seen by target_user, src_ip
-| where failures > 0 AND successes > 0
+| where failures > 3 AND successes > 0
 | eval first_seen=strftime(first_seen,"%F %T"), last_seen=strftime(last_seen,"%F %T")
 
 # L3 - Sudo session opened for root, excluding cron (T1548.003 Sudo and Sudo Caching)
