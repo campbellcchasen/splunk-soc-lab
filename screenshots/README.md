@@ -25,5 +25,5 @@ Unredacted originals are kept locally in `screenshots/raw/` (not committed — s
 | 14 | `14-splunk-receiving-9997.png` | Splunk configured to receive on TCP 9997 |
 | 15 | `15-ssh-attack.png` | Hydra SSH brute-force test from Kali against Mint |
 | 16 | `16-l1-ssh-bruteforce.png` | L1 — SSH brute force detection results |
-| 17 | `17-l2-sudo-root.png` | L3 — sudo session opened for root |
-| 18 | `18-l3-new-user.png` | L4 — new local user created (`labvictim`) |
+| 17 | `17-l3-sudo-root.png` | L3 — sudo session opened for root |
+| 18 | `18-l4-new-user.png` | L4 — new local user created (`labvictim`) |

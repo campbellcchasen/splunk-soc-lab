@@ -4,9 +4,10 @@ A hands-on Splunk lab built to practice SOC Analyst I detection engineering: ing
 Windows and Linux security logs, writing SPL detections mapped to MITRE ATT&CK, and
 documenting the full workflow end to end.
 
-> **Lab only.** All hosts, accounts, and attacks in this project are isolated virtual
-> machines and test accounts created for this exercise. Nothing here targets a real
-> production system.
+> **Lab only.** All hosts, accounts, and attacks in this project are my own virtual
+> machines and test accounts, created for this exercise. The VMs share my home network
+> on a bridged adapter, and every test targets only my own systems. Nothing here targets
+> a real production system.
 
 ## Goals
 
