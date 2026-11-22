@@ -1,0 +1,25 @@
+# L1 - SSH brute force (T1110 Brute Force)
+index=linuxlogs sourcetype=linux_secure "Failed password"
+| rex "Failed password for (invalid user )?(?<target_user>\S+) from (?<src_ip>\S+)"
+| stats count AS failures, dc(target_user) AS accounts_tried by src_ip
+| where failures > 3
+| sort - failures
+
+# L2 - Failures followed by a success (T1110 / T1078 Valid Accounts)
+index=linuxlogs sourcetype=linux_secure ("Failed password" OR "Accepted password")
+| rex "(?<outcome>Failed|Accepted) password for (invalid user )?(?<target_user>\S+) from (?<src_ip>\S+)"
+| stats count(eval(outcome="Failed")) AS failures, count(eval(outcome="Accepted")) AS successes, earliest(_time) AS first_seen, latest(_time) AS last_seen by target_user, src_ip
+| where failures > 0 AND successes > 0
+| eval first_seen=strftime(first_seen,"%F %T"), last_seen=strftime(last_seen,"%F %T")
+
+# L3 - Sudo session opened for root, excluding cron (T1548.003 Sudo and Sudo Caching)
+index=linuxlogs sourcetype=linux_secure "session opened for user root"
+| rex "session opened for user root\(uid=\d+\) by (?<sudo_user>\S+)\(uid=\d+\)"
+| table _time host sudo_user
+| where sudo_user!="root"
+
+# L4 - New local user created, excluding service accounts (T1136.001 Local Account)
+index=linuxlogs sourcetype=linux_secure ("new user" OR "useradd")
+| rex "new user: name=(?<new_user>\S+)"
+| table _time host new_user
+| where new_user!="sshd," AND new_user!="splunkfwd,"
