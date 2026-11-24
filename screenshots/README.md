@@ -29,3 +29,8 @@ Unredacted originals are kept locally in `screenshots/raw/` (not committed — s
 | 18 | `18-l4-new-user.png` | L4 — new local user created (`labvictim`) |
 | 19 | `19-d4-log-cleared.png` | D4 — security audit log cleared (Event 1102) |
 | 20 | `20-l2-ssh-fail-then-success.png` | L2 — SSH failures followed by a success (`labvictim`) |
+| 21 | `21-alert-d1-baseline-no-results.png` | D1 over the last 15 minutes before testing (no results) |
+| 22 | `22-alert-d1-save-as-alert-config.png` | D1 Save As Alert settings (cron, trigger, throttle, severity) |
+| 23 | `23-alert-d1-saved.png` | D1 alert saved |
+| 24 | `24-alerts-list-scheduled.png` | All ten alerts scheduled and enabled |
+| 25 | `25-d1-after-simulated-failed-logons.png` | D1 returning the simulated failed logons |

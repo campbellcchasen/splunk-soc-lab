@@ -35,7 +35,7 @@ documenting the full workflow end to end.
 
 - `queries/` — SPL detections, in the order they were built
 - `configs/` — Splunk Universal Forwarder config files (`inputs.conf`, `outputs.conf`)
-- `docs/` — setup documentation (Linux forwarder integration)
+- `docs/` — setup documentation, alerting walkthrough, analyst runbook, and handoff template
 - `screenshots/` — redacted evidence for each detection and setup step
 - `scripts/` — supporting scripts
 - `LICENSE`
@@ -76,6 +76,10 @@ full list).
    index. Full steps are in `docs/linux-forwarder-setup.md`.
 6. Ran an SSH brute-force test from Kali against Mint with Hydra, then wrote and
    validated Linux detections (L1–L4).
+7. Converted the ten Windows and Linux detections (D1–D6, L1–L4) into scheduled alerts
+   that run every 15 minutes and post to Triggered Alerts, then tested them with
+   simulated activity. Full steps are in `docs/06-scheduled-alerts.md`; the workflow I
+   follow when an alert fires is in `docs/07-analyst-runbook.md`.
 
 ## Example: D2 triage walkthrough
 
@@ -113,7 +117,7 @@ succeeded. Triage steps:
 
 ## What I'd do next
 
-- Save the D2 (and L2) detection as a real-time alert instead of a saved search.
+- Build a triage dashboard on top of the triggered alerts, and tune thresholds as I see real noise.
 - Add Sysmon on the Windows host for richer process-level telemetry.
 - Install the official Splunk Add-on for Windows to get proper field extractions instead
   of relying on `rex`.
