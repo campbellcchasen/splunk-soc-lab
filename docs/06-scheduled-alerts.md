@@ -88,6 +88,23 @@ Before the scheduled run, I confirmed that Splunk had indexed the failed logons 
 
 ![D1 returns the simulated failures](../screenshots/25-d1-after-simulated-failed-logons.png)
 
+## Result: what fired
+
+At the 8:30 PM scheduled run, four alerts appeared in **Activity > Triggered Alerts**: D1 (High), D3 (Medium), D5 (High) and D6 (Medium). Each one triggered within two seconds of the scheduled time.
+
+![Triggered alerts after the 8:30 PM run](../screenshots/26-triggered-alerts.png)
+
+| Alert | Fired at 8:30 PM? | Notes |
+|---|---|---|
+| D1 | Yes | Failed logons fell inside the 15 minute window |
+| D3 | Yes | New local account created |
+| D5 | Yes | Account added to Administrators |
+| D6 | Yes | Test service installed |
+| D2 | No | I have not confirmed why yet. I need to check whether the failures and the success fell inside the same 15 minute window and whether the query's conditions matched |
+| D4, L1-L4 | No | Not expected: I did not clear the log, and the Linux VMs were not generating traffic during this test |
+
+Not every alert firing is itself a result. The D2 miss is a good tuning exercise: I would run the D2 query over a wider time range to see whether it matches, and then decide whether the window or the logic needs to change.
+
 ## Clean up
 
 When testing is finished, remove everything I created:
