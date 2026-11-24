@@ -1,0 +1,51 @@
+<dashboard version="1.1" theme="dark">
+  <label>SOC Overview</label>
+  <description>Triage view: triggered alerts, failed logons, and key security events (lab data)</description>
+  <row>
+    <panel>
+      <title>Alert runs that returned results (24h)</title>
+      <table>
+        <search>
+          <query>index=_internal sourcetype=scheduler status=success result_count!=0 | regex savedsearch_name="^[DL][0-9] - " | eval run_time=strftime(_time,"%F %T") | table run_time savedsearch_name result_count | sort - run_time</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Key security events by type (24h)</title>
+      <chart>
+        <search>
+          <query>index=winlogs source="WinEventLog:Security" (EventCode=4720 OR EventCode=4732 OR EventCode=1102 OR EventCode=7045) | stats count by EventCode</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Failed logons over time (Windows, 4625)</title>
+      <chart>
+        <search>
+          <query>index=winlogs source="WinEventLog:Security" EventCode=4625 | timechart span=15m count</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>SSH failed passwords over time (Linux)</title>
+      <chart>
+        <search>
+          <query>index=linuxlogs "Failed password" | timechart span=15m count</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>

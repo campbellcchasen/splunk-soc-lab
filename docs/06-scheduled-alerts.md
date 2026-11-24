@@ -100,10 +100,29 @@ At the 8:30 PM scheduled run, four alerts appeared in **Activity > Triggered Ale
 | D3 | Yes | New local account created |
 | D5 | Yes | Account added to Administrators |
 | D6 | Yes | Test service installed |
-| D2 | No | I have not confirmed why yet. I need to check whether the failures and the success fell inside the same 15 minute window and whether the query's conditions matched |
+| D2 | No | Investigated below: no successful logon (4624) for the test account was ever indexed, so the condition could not match |
 | D4, L1-L4 | No | Not expected: I did not clear the log, and the Linux VMs were not generating traffic during this test |
 
-Not every alert firing is itself a result. The D2 miss is a good tuning exercise: I would run the D2 query over a wider time range to see whether it matches, and then decide whether the window or the logic needs to change.
+### Investigating why D2 did not fire
+
+D2 needs more than 3 failures and at least one success for the same account. I searched for 4624 and 4625 events mentioning the test account over the last two hours. Result: 9 failed logons (4625) between 8:17 and 8:18 PM, and no 4624 for that account. A broader check showed 4624 events are being indexed in general (135 in 24 hours), so ingestion was fine. The simulated success logon simply never produced a 4624 event for that account in the Security log, so D2 had nothing to match. The detection logic is not the problem.
+
+What I would do next: rerun the success step with a real interactive or network logon for the test account (for example signing in as that user), confirm a 4624 with the test account name appears in Splunk, and then wait for the next scheduled run. The lesson is to always confirm the raw events exist before blaming the detection.
+
+## SOC Overview dashboard
+
+To give myself one screen to start a shift on, I built a classic Simple XML dashboard called **SOC Overview**: Dashboards > Create New Dashboard > Classic Dashboards, then **Source** to paste the XML from `configs/soc-overview-dashboard.xml`. It has four panels:
+
+| Panel | What it answers |
+|---|---|
+| Alert runs that returned results (24h) | Which alerts fired and when, read from Splunk's scheduler log |
+| Key security events by type (24h) | Counts of new accounts (4720), admin group changes (4732), log clears (1102) and new services (7045) |
+| Failed logons over time (Windows) | Whether there is a spike in 4625 events |
+| SSH failed passwords over time (Linux) | Same for SSH. It is empty now because the Linux VMs were not generating traffic |
+
+![SOC Overview dashboard](../screenshots/27-soc-overview-dashboard.png)
+
+Two things I ran into while building it. The editor auto-closes XML tags, so typing the XML by hand duplicated every closing tag, and I had to paste the whole block instead. And my first filter for the alert panel (`D*`) also matched a built-in Splunk search, so I switched to a regex, `^[DL][0-9] - `, that matches only my alert names.
 
 ## Clean up
 

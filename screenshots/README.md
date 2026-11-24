@@ -34,3 +34,5 @@ Unredacted originals are kept locally in `screenshots/raw/` (not committed — s
 | 23 | `23-alert-d1-saved.png` | D1 alert saved |
 | 24 | `24-alerts-list-scheduled.png` | All ten alerts scheduled and enabled |
 | 25 | `25-d1-after-simulated-failed-logons.png` | D1 returning the simulated failed logons |
+| 26 | `26-triggered-alerts.png` | Triggered Alerts after the 8:30 PM run (D1, D3, D5, D6) |
+| 27 | `27-soc-overview-dashboard.png` | SOC Overview dashboard (alert runs, key events, failed logon charts) |

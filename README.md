@@ -34,7 +34,7 @@ documenting the full workflow end to end.
 ## Repo layout
 
 - `queries/` — SPL detections, in the order they were built
-- `configs/` — Splunk Universal Forwarder config files (`inputs.conf`, `outputs.conf`)
+- `configs/` — Splunk Universal Forwarder config files (`inputs.conf`, `outputs.conf`) and the SOC Overview dashboard XML
 - `docs/` — setup documentation, alerting walkthrough, analyst runbook, and handoff template
 - `screenshots/` — redacted evidence for each detection and setup step
 - `scripts/` — supporting scripts
